@@ -2,6 +2,8 @@
 
 A beautiful, modern web application built with Django that converts between Base64 strings and image files.
 
+**GitHub Repository:** [https://github.com/zpratikpathak/Base64-to-Image](https://github.com/zpratikpathak/Base64-to-Image)
+
 ## Features
 
 - 🔄 **Bidirectional Conversion**: Convert Base64 to images or images to Base64
@@ -206,3 +208,11 @@ This project is open source and available under the MIT License.
 ## Contributing
 
 Contributions, issues, and feature requests are welcome!
+
+**GitHub Repository:** [https://github.com/zpratikpathak/Base64-to-Image](https://github.com/zpratikpathak/Base64-to-Image)
+
+Please feel free to:
+- ⭐ Star the repository
+- 🐛 Report bugs
+- 💡 Suggest new features
+- 🔧 Submit pull requests
