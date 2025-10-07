@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en" ondragover="event.preventDefault();" ondrop="event.preventDefault();">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 Image Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #667eea;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .file-upload-label:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .file-upload-label.drag-over {
+            background: #667eea;
+            color: white;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 2em;
+        }
+
+        .upload-text {
+            font-size: 1em;
+        }
+
+        .upload-subtext {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .paste-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px auto;
+        }
+
+        .paste-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .paste-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .clear-btn {
+            background: #f44336;
+            color: white;
+            padding: 15px 25px;
+        }
+
+        .clear-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .output-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .output-section.show {
+            display: block;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .output-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .copy-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .copy-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn.copied {
+            background: #2196F3;
+        }
+
+        .output-content {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .output-image {
+            text-align: center;
+        }
+
+        .output-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .output-text {
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body ondragover="event.preventDefault();" ondrop="event.preventDefault();">
+    <div class="container">
+        <h1>🔄 Base64 Image Converter</h1>
+        <p class="subtitle">Convert between Base64 strings and images effortlessly</p>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <textarea 
+                    id="base64Input" 
+                    placeholder="Paste your Base64 string here..."></textarea>
+            </div>
+            
+            <div class="divider">OR</div>
+            
+            <div class="file-upload">
+                <label for="fileInput" class="file-upload-label" id="dropZone"
+                       ondragenter="event.preventDefault(); event.stopPropagation(); this.classList.add('drag-over');"
+                       ondragover="event.preventDefault(); event.stopPropagation(); this.classList.add('drag-over');"
+                       ondragleave="event.preventDefault(); event.stopPropagation(); this.classList.remove('drag-over');"
+                       ondrop="event.preventDefault(); event.stopPropagation(); handleFileDrop(event, this);">
+                    <span class="upload-icon">📁</span>
+                    <span class="upload-text">Click to upload or drag & drop</span>
+                    <span class="upload-subtext">Supports PNG, JPEG, GIF, BMP, WebP, PDF</span>
+                </label>
+                <input type="file" id="fileInput" accept="image/*,.pdf">
+                <div class="file-name" id="fileName"></div>
+            </div>
+
+            <button class="paste-btn" id="pasteBtn">
+                📋 Paste from Clipboard
+            </button>
+            <div style="text-align: center; color: #666; font-size: 13px; margin-top: 5px;">
+                💡 Tip: If you copied a file, use <strong>Ctrl+V</strong> instead
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="convert-btn" id="convertBtn">Convert</button>
+            <button class="clear-btn" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #667eea;">Processing...</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="output-section" id="outputSection">
+            <div class="output-header">
+                <div class="output-title" id="outputTitle">Output</div>
+                <button class="copy-btn" id="copyBtn">📋 Copy to Clipboard</button>
+            </div>
+            <div class="output-content" id="outputContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize variables
+        const base64Input = document.getElementById('base64Input');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const convertBtn = document.getElementById('convertBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const outputSection = document.getElementById('outputSection');
+        const outputContent = document.getElementById('outputContent');
+        const outputTitle = document.getElementById('outputTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+        const dropZone = document.getElementById('dropZone');
+
+        let currentOutput = '';
+        let conversionType = '';
+
+        // Handle file drop from inline event handler
+        function handleFileDrop(e, element) {
+            element.classList.remove('drag-over');
+            
+            console.log('✓ Drop event triggered!');
+            
+            const files = e.dataTransfer.files;
+            
+            if (files && files.length > 0) {
+                const file = files[0];
+                console.log('✓ File received:', file.name, 'Type:', file.type);
+                
+                // Check if it's an image or PDF
+                if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+                    try {
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        fileInput.files = dt.files;
+                        
+                        const fileType = file.type === 'application/pdf' ? ' (PDF - will convert first page)' : '';
+                        fileName.textContent = `Selected: ${file.name}${fileType}`;
+                        base64Input.value = '';
+                        
+                        console.log('✓ File successfully set! You can now click Convert.');
+                    } catch (err) {
+                        console.error('Error setting file:', err);
+                        showError('Error processing file. Please try clicking to upload.');
+                    }
+                } else {
+                    console.warn('Not a valid file:', file.type);
+                    showError('Please drop an image file (PNG, JPEG, GIF, etc.) or PDF');
+                }
+            } else {
+                console.warn('No files in drop event');
+            }
+        }
+
+        // Global paste event listener (catches Ctrl+V and handles file pastes)
+        document.addEventListener('paste', function(e) {
+            console.log('Paste event detected!');
+            
+            // Check if there are files in the clipboard
+            if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
+                e.preventDefault();
+                
+                const file = e.clipboardData.files[0];
+                console.log('✓ File from paste event:', file.name, 'Type:', file.type);
+                
+                // Check if it's an image or PDF
+                if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    fileInput.files = dt.files;
+                    
+                    const fileType = file.type === 'application/pdf' ? 'PDF' : 'Image';
+                    fileName.textContent = `Selected: ${file.name} (pasted ${fileType})`;
+                    base64Input.value = '';
+                    errorMessage.classList.remove('show');
+                    
+                    console.log(`✓ ${fileType} file pasted successfully! Click Convert to process.`);
+                } else {
+                    showError('Pasted file is not an image or PDF. Please paste a valid file.');
+                }
+            } else if (e.clipboardData && e.clipboardData.items) {
+                // Check for image data in clipboard items
+                for (let i = 0; i < e.clipboardData.items.length; i++) {
+                    const item = e.clipboardData.items[i];
+                    
+                    if (item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        
+                        const blob = item.getAsFile();
+                        if (blob) {
+                            console.log('✓ Image blob from paste:', blob.type, blob.size, 'bytes');
+                            
+                            const dt = new DataTransfer();
+                            dt.items.add(blob);
+                            fileInput.files = dt.files;
+                            
+                            fileName.textContent = `Selected: ${blob.name || 'clipboard-image.png'} (pasted)`;
+                            base64Input.value = '';
+                            errorMessage.classList.remove('show');
+                            
+                            console.log('✓ Image pasted successfully! Click Convert to process.');
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        // Handle paste from clipboard button
+        const pasteBtn = document.getElementById('pasteBtn');
+        
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                errorMessage.classList.remove('show');
+                
+                // Check if clipboard API is available
+                if (!navigator.clipboard) {
+                    showError('Clipboard API not supported in this browser. Use a modern browser like Chrome, Edge, or Firefox.');
+                    return;
+                }
+
+                console.log('Reading clipboard...');
+                
+                // Try to read clipboard items (for images and text)
+                const clipboardItems = await navigator.clipboard.read();
+                
+                let foundContent = false;
+                
+                for (const clipboardItem of clipboardItems) {
+                    console.log('Clipboard item types:', clipboardItem.types);
+                    
+                    // Check for image types first
+                    for (const type of clipboardItem.types) {
+                        if (type.startsWith('image/')) {
+                            console.log('✓ Found image in clipboard:', type);
+                            
+                            const blob = await clipboardItem.getType(type);
+                            console.log('✓ Image blob size:', blob.size, 'bytes');
+                            
+                            // Create a File object from the blob
+                            const file = new File([blob], 'clipboard-image.png', { type: type });
+                            
+                            // Set to file input
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            fileInput.files = dt.files;
+                            
+                            fileName.textContent = `Selected: ${file.name} (from clipboard)`;
+                            base64Input.value = '';
+                            
+                            console.log('✓ Image pasted successfully! Click Convert to process.');
+                            foundContent = true;
+                            break;
+                        }
+                    }
+                    
+                    if (foundContent) break;
+                    
+                    // If no image found, try to get text (might be base64)
+                    if (clipboardItem.types.includes('text/plain')) {
+                        console.log('✓ Found text in clipboard, checking if it\'s base64...');
+                        
+                        const blob = await clipboardItem.getType('text/plain');
+                        const text = await blob.text();
+                        
+                        if (text.trim()) {
+                            console.log('✓ Text length:', text.length);
+                            
+                            // Check if it looks like base64 or data URI
+                            if (text.startsWith('data:image') || isLikelyBase64(text.trim())) {
+                                base64Input.value = text.trim();
+                                fileInput.value = '';
+                                fileName.textContent = '';
+                                
+                                console.log('✓ Base64 string pasted! Click Convert to process.');
+                                foundContent = true;
+                            } else {
+                                showError('Clipboard contains text but it doesn\'t appear to be a valid Base64 string or data URI.');
+                                console.warn('Text doesn\'t look like base64');
+                            }
+                        }
+                        break;
+                    }
+                }
+                
+                if (!foundContent) {
+                    showError('No image or Base64 string found in clipboard. If you copied a FILE: Press Ctrl+V instead. Otherwise: Right-click an image → Copy, or take a screenshot.');
+                }
+                
+            } catch (err) {
+                console.error('Clipboard error:', err);
+                
+                if (err.name === 'NotAllowedError') {
+                    showError('Clipboard access denied. Please allow clipboard permissions in your browser settings.');
+                } else {
+                    showError('Failed to read clipboard. Try: Right-click an image → Copy, or use Ctrl+V to paste a file.');
+                }
+            }
+        });
+
+        // Helper function to check if text looks like base64
+        function isLikelyBase64(text) {
+            // Remove whitespace
+            text = text.replace(/\s/g, '');
+            
+            // Check length (base64 length should be divisible by 4)
+            if (text.length < 50 || text.length % 4 !== 0) {
+                return false;
+            }
+            
+            // Check if it contains only valid base64 characters
+            const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
+            return base64Regex.test(text);
+        }
+
+        // File input change handler
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileName.textContent = `Selected: ${e.target.files[0].name}`;
+                base64Input.value = '';
+            }
+        });
+
+        // Base64 input change handler
+        base64Input.addEventListener('input', () => {
+            if (base64Input.value.trim()) {
+                fileInput.value = '';
+                fileName.textContent = '';
+            }
+        });
+
+        // Clear button
+        clearBtn.addEventListener('click', () => {
+            base64Input.value = '';
+            fileInput.value = '';
+            fileName.textContent = '';
+            outputSection.classList.remove('show');
+            errorMessage.classList.remove('show');
+            currentOutput = '';
+        });
+
+        // Convert button
+        convertBtn.addEventListener('click', async () => {
+            errorMessage.classList.remove('show');
+            outputSection.classList.remove('show');
+            
+            const formData = new FormData();
+            
+            // Check if file is uploaded
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+                conversionType = 'image_to_base64';
+            } else if (base64Input.value.trim()) {
+                formData.append('base64_input', base64Input.value.trim());
+                conversionType = 'base64_to_image';
+            } else {
+                showError('Please provide either a Base64 string or upload an image file.');
+                return;
+            }
+
+            loading.classList.add('show');
+            convertBtn.disabled = true;
+
+            try {
+                const response = await fetch('/convert/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayOutput(data);
+                    
+                    // Show message if PDF was converted
+                    if (data.message) {
+                        console.log('ℹ️', data.message);
+                    }
+                } else {
+                    showError(data.error || 'Conversion failed. Please try again.');
+                }
+            } catch (error) {
+                showError('An error occurred. Please try again.');
+                console.error('Error:', error);
+            } finally {
+                loading.classList.remove('show');
+                convertBtn.disabled = false;
+            }
+        });
+
+        // Copy button
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(currentOutput);
+                copyBtn.textContent = '✓ Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Copy to Clipboard';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (error) {
+                showError('Failed to copy to clipboard.');
+            }
+        });
+
+        function displayOutput(data) {
+            currentOutput = data.result;
+            
+            if (data.type === 'base64_to_image') {
+                outputTitle.textContent = 'Converted Image';
+                outputContent.innerHTML = `
+                    <div class="output-image">
+                        <img src="${data.result}" alt="Converted Image">
+                    </div>
+                `;
+            } else if (data.type === 'image_to_base64') {
+                outputTitle.textContent = 'Base64 String';
+                outputContent.innerHTML = `
+                    <div class="output-text">${escapeHtml(data.result)}</div>
+                `;
+            }
+            
+            outputSection.classList.add('show');
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Allow Enter key to convert (Ctrl+Enter in textarea)
+        base64Input.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                convertBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
