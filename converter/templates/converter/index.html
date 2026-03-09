@@ -334,7 +334,7 @@
                        ondrop="event.preventDefault(); event.stopPropagation(); handleFileDrop(event, this);">
                     <span class="upload-icon">📁</span>
                     <span class="upload-text">Click to upload or drag & drop</span>
-                    <span class="upload-subtext">Supports PNG, JPEG, GIF, BMP, WebP, PDF</span>
+                    <span class="upload-subtext">Supports PNG, JPEG, BMP, TIFF, GIF, WebP, PDF (Max 10MB)</span>
                 </label>
                 <input type="file" id="fileInput" accept="image/*,.pdf">
                 <div class="file-name" id="fileName"></div>
@@ -679,14 +679,26 @@
             currentOutput = data.result;
             
             if (data.type === 'base64_to_image') {
-                outputTitle.textContent = 'Converted Image';
+                const formatInfo = data.format ? ` (${data.format})` : '';
+                outputTitle.textContent = `Converted Image${formatInfo}`;
                 outputContent.innerHTML = `
                     <div class="output-image">
                         <img src="${data.result}" alt="Converted Image">
                     </div>
                 `;
-            } else if (data.type === 'image_to_base64') {
-                outputTitle.textContent = 'Base64 String';
+            } else if (data.type === 'base64_to_pdf') {
+                outputTitle.textContent = 'Converted PDF';
+                outputContent.innerHTML = `
+                    <div class="output-image">
+                        <embed src="${data.result}" type="application/pdf" width="100%" height="600px" style="border-radius: 10px;" />
+                        <p style="margin-top: 10px; text-align: center; color: #666;">
+                            PDF preview shown above. Copy the base64 string to use elsewhere.
+                        </p>
+                    </div>
+                `;
+            } else if (data.type === 'image_to_base64' || data.type === 'pdf_to_base64') {
+                const formatInfo = data.format ? ` (${data.format} format)` : '';
+                outputTitle.textContent = `Base64 String${formatInfo}`;
                 outputContent.innerHTML = `
                     <div class="output-text">${escapeHtml(data.result)}</div>
                 `;
