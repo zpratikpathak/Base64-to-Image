@@ -42,7 +42,7 @@ uv run python manage.py migrate --noinput
 REM Start server in background and save PID
 echo Starting Django server with Waitress (production-ready WSGI server)...
 echo Server will be available at http://127.0.0.1:8000
-echo Server can handle multiple concurrent requests (100-200+ requests/day)
+:: echo Server can handle multiple concurrent requests (100-200+ requests/day)
 echo.
 echo Opening browser...
 timeout /t 2 /nobreak >nul
