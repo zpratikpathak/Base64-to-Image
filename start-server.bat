@@ -40,8 +40,9 @@ echo Running database migrations...
 uv run python manage.py migrate --noinput
 
 REM Start server in background and save PID
-echo Starting Django development server...
+echo Starting Django server with Waitress (production-ready WSGI server)...
 echo Server will be available at http://127.0.0.1:8000
+echo Server can handle multiple concurrent requests (100-200+ requests/day)
 echo.
 echo Opening browser...
 timeout /t 2 /nobreak >nul
@@ -54,8 +55,9 @@ echo Press Ctrl+C to stop the server
 echo ========================================
 echo.
 
-REM Start the server using UV run (this will block until Ctrl+C)
-uv run python manage.py runserver
+REM Start the server using Waitress (production WSGI server for Windows)
+REM Waitress supports multiple threads and can handle concurrent requests
+uv run waitress-serve --host=127.0.0.1 --port=8000 --threads=4 base64_project.wsgi:application
 
 REM Cleanup on exit
 echo.

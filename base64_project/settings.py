@@ -105,3 +105,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+
+# Performance optimizations
+# Database connection settings for better concurrency
+DATABASES['default']['OPTIONS'] = {
+    'timeout': 20,
+    'check_same_thread': False,  # Allow multiple threads to use the same connection
+}
+
+# Cache configuration (using in-memory cache for better performance)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+# Session settings - optimize for performance
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  # Use cached database sessions
+SESSION_CACHE_ALIAS = 'default'
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = False
+
+# Connection pooling and timeout settings
+CONN_MAX_AGE = 600  # Keep database connections alive for 10 minutes
