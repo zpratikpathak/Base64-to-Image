@@ -5,7 +5,7 @@ description = "Django-based Base64 and Image converter"
 requires-python = ">=3.10"
 dependencies = [
     "django>=5.0",
-    "pillow>=10.0.0",
+    "pillow>=12.2.0",
     "PyMuPDF>=1.23.0",
     "waitress>=3.0.0",
 ]
